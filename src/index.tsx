@@ -1,10 +1,9 @@
-import * as React from 'react'
-import styles from './styles.module.css'
+import { resetInitialReducer } from './resetState'
 
-interface Props {
-  text: string
+const createResetState = () => {
+  return {
+    onReducer: resetInitialReducer
+  }
 }
 
-export const ExampleComponent = ({ text }: Props) => {
-  return <div className={styles.test}>Example Component: {text}</div>
-}
+export default createResetState
