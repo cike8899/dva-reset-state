@@ -4,7 +4,7 @@
   "description": "dva reset state plugin",
   "author": "balibabu",
   "license": "MIT",
-  "repository": "balibabu/dva-reset-state",
+  "repository": "cike8899/dva-reset-state",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.tsx",
