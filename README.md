@@ -2,6 +2,8 @@
 
 > dva reset state plugin
 
+> 页面离开清理 dva 或 redux 中相关数据
+
 [![NPM](https://img.shields.io/npm/v/dva-reset-state.svg)](https://www.npmjs.com/package/dva-reset-state) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Install
