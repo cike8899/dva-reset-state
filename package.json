@@ -43,6 +43,8 @@
     "@typescript-eslint/parser": "^2.26.0",
     "babel-eslint": "^10.0.3",
     "cross-env": "^7.0.2",
+    "dva": "^2.4.1",
+    "dva_2.6.0-beta.20": "npm:dva@2.6.0-beta.20",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-config-standard": "^14.1.0",

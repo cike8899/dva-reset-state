@@ -1,7 +1,27 @@
 import './index.css'
 
-import React from 'react'
-import ReactDOM from 'react-dom'
+import dva from 'dva_2.6.0-beta.20'
+import { createBrowserHistory } from 'history'
+import createResetState from 'dva-reset-state'
 import App from './App'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+import editProduct from './models/editProduct'
+import productList from './models/productList'
+
+const history = createBrowserHistory({
+  basename: ''
+})
+
+const app = dva({
+  history
+})
+
+app.model(editProduct)
+app.model(productList)
+
+app.use(createResetState())
+
+app.router(App as any)
+app.start('#root')
+
+export default app
