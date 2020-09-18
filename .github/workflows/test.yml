@@ -7,5 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install modules
         run: yarn
-      - name: Run tests
-        run: yarn run test:unit
+      - name: Run tests with redux@3.x
+        run: REACT_APP_REDUX_VERSION=3.x yarn run test:unit
+      - name: Run tests with redux@4.x
+        run: REACT_APP_REDUX_VERSION=4.x yarn run test:unit

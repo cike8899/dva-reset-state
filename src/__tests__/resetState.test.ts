@@ -1,7 +1,16 @@
 import { createStore, Store } from 'redux'
+import { createStore as createStoreNext } from 'redux-4.x'
 import { resetInitialReducer, reset } from '../resetState'
 import { initialState } from '../__mockData__/state.constant'
 
+const packages = {
+  '3.x': createStore,
+  '4.x': createStoreNext
+}
+
+const reduxVersion = process.env.REACT_APP_REDUX_VERSION || '3.x'
+
+const createStoreLast = packages[reduxVersion]
 const rootReducer = (
   state = initialState,
   action: { type: string; [extraProps: string]: any }
@@ -41,7 +50,7 @@ const rootReducer = (
 
 let store: Store<any>
 beforeEach(() => {
-  store = createStore(resetInitialReducer(rootReducer))
+  store = createStoreLast(resetInitialReducer(rootReducer))
 })
 
 describe('restState', () => {

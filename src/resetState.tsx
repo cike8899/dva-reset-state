@@ -75,7 +75,7 @@ export const resetInitialReducer: (reducer: Reducer<any>) => any = (
   return (state: any, action: any) => {
     let newState: any = reducer(state, action)
     // 为了解决redux devtools 发出PERFORM_ACTION将redux 的@@redux/INIT覆盖掉
-    if (action.type === '@@INIT' || action.type === '@@redux/INIT') {
+    if (action.type === '@@INIT' || action.type.startsWith('@@redux/INIT')) {
       initialState = newState // 缓存所有初始state
     }
 

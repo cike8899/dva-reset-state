@@ -61,6 +61,7 @@
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
     "redux": "3.7.2",
+    "redux-4.x": "npm:redux",
     "typescript": "^3.7.5"
   },
   "files": [
