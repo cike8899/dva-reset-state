@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { isObject, pick, omit, merge } from './utils'
+import { isObject, pick, merge } from './utils'
 
 export const resetType = '@@reset'
 
