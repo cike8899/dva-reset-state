@@ -81,7 +81,7 @@ describe('restState', () => {
     expect(mockFn).toHaveNthReturnedWith(2, [])
   })
 
-  it('reset multipe field of one namespace', () => {
+  it('reset multiple field of one namespace', () => {
     const mockFn = jest.fn(() => {
       const ret: any = store.getState()
       return ret.productList
@@ -127,7 +127,7 @@ describe('restState', () => {
       payload: [{ id: 1, title: 'geek' }]
     })
 
-    //通过namespace， 重置namespace下的所有状态
+    // 通过namespace， 重置namespace下的所有状态
     reset(store.dispatch, 'productList')
 
     expect(mockFn).toBeCalledTimes(2)
@@ -138,7 +138,7 @@ describe('restState', () => {
     expect(mockFn).toHaveNthReturnedWith(2, initialState.productList)
   })
 
-  it('reset partial fileds of two namespace', () => {
+  it('reset partial fields of two namespace', () => {
     const mockFn = jest.fn(() => {
       const ret: any = store.getState()
       return ret
@@ -162,7 +162,7 @@ describe('restState', () => {
       }
     })
 
-    //通过namespace， 重置namespace下的所有状态
+    // 通过namespace， 重置namespace下的所有状态
     reset(store.dispatch, { productList: 'list', editProduct: 'productInfo' })
 
     expect(mockFn).toBeCalledTimes(3)
@@ -194,6 +194,89 @@ describe('restState', () => {
     expect(mockFn).toHaveNthReturnedWith(3, initialState)
   })
 
+  it('reset another field of namespace state except one namespace', () => {
+    const mockFn = jest.fn(() => {
+      const ret: any = store.getState()
+      return ret
+    })
+    store.subscribe(mockFn)
+
+    // 修改数据
+    store.dispatch({
+      type: 'productList/setProductList',
+      payload: [{ id: 1, title: 'geek' }]
+    })
+
+    store.dispatch({
+      type: 'editProduct/alterProductInfo',
+      payload: {
+        id: 1,
+        name: 'default',
+        description: 'system default project',
+        createTime: '2019-12-09T02:18:29Z',
+        modTime: '2020-06-08T06:59:51Z'
+      }
+    })
+
+    store.dispatch({
+      type: 'userList/alterUserList',
+      payload: [{ id: 1, name: 'balibabu' }]
+    })
+
+    reset(store.dispatch, 'userList', true)
+
+    expect(mockFn).toBeCalledTimes(4)
+
+    expect(mockFn).toHaveNthReturnedWith(1, {
+      ...initialState,
+      productList: {
+        ...initialState.productList,
+        list: [{ id: 1, title: 'geek' }]
+      }
+    })
+
+    expect(mockFn).toHaveNthReturnedWith(2, {
+      ...initialState,
+      productList: {
+        ...initialState.productList,
+        list: [{ id: 1, title: 'geek' }]
+      },
+      editProduct: {
+        ...initialState.editProduct,
+        productInfo: {
+          id: 1,
+          name: 'default',
+          description: 'system default project',
+          createTime: '2019-12-09T02:18:29Z',
+          modTime: '2020-06-08T06:59:51Z'
+        }
+      }
+    })
+
+    expect(mockFn).toHaveNthReturnedWith(3, {
+      ...initialState,
+      productList: {
+        ...initialState.productList,
+        list: [{ id: 1, title: 'geek' }]
+      },
+      editProduct: {
+        ...initialState.editProduct,
+        productInfo: {
+          id: 1,
+          name: 'default',
+          description: 'system default project',
+          createTime: '2019-12-09T02:18:29Z',
+          modTime: '2020-06-08T06:59:51Z'
+        }
+      },
+      userList: [{ id: 1, name: 'balibabu' }]
+    })
+
+    expect(mockFn).toHaveNthReturnedWith(4, {
+      ...initialState,
+      userList: [{ id: 1, name: 'balibabu' }]
+    })
+  })
   it('reset all filed of one and partial data of the other one ', () => {
     const mockFn = jest.fn(() => {
       const ret: any = store.getState()
@@ -228,7 +311,7 @@ describe('restState', () => {
       payload: [{ id: 1, name: 'balibabu' }]
     })
 
-    //通过namespace，重置userList下的所有状态,重置productList跟editProduct下部分状态
+    // 通过 namespace，重置userList下的所有状态,重置productList跟editProduct下部分状态
     reset(store.dispatch, ['userList', { productList: ['list', 'pageInfo'] }])
 
     expect(mockFn).toBeCalledTimes(5)
@@ -331,7 +414,7 @@ describe('restState', () => {
       }
     })
 
-    //通过namespace， 重置namespace下的所有状态
+    // 通过namespace， 重置namespace下的所有状态
     reset(store.dispatch) // 不传递namespace则重置所有state
 
     expect(mockFn).toBeCalledTimes(3)

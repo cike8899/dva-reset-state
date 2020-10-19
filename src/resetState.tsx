@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { isObject, pick, merge } from './utils'
+import { isObject, pick, merge, omit } from './utils'
 
 export const resetType = '@@reset'
 
@@ -38,10 +38,11 @@ interface PayloadDispatch<S = any> {
 
 export const reset = (
   dispatch: PayloadDispatch,
-  payload?: NamespaceOrFiled
+  payload?: NamespaceOrFiled,
+  isOmitted = false
 ) => {
   if (dispatch) {
-    dispatch({ type: resetType, payload: payload })
+    dispatch({ type: resetType, payload: { data: payload, isOmitted } })
   }
 }
 
@@ -86,33 +87,43 @@ export const resetInitialReducer: (reducer: Reducer<any>) => any = (
     }
 
     if (action.type === resetType) {
-      const { payload } = action
-      checkNamespaceOrField(payload, initialState)
-      if (payload === undefined) {
+      const {
+        payload: { data, isOmitted }
+      } = action
+      checkNamespaceOrField(data, initialState)
+      if (data === undefined) {
         // 重置所有state
         newState = initialState
-      } else if (typeof payload === 'string') {
-        // 重置单个namespace
-        newState = {
-          ...newState,
-          [payload]: initialState[payload]
+      } else if (typeof data === 'string') {
+        if (isOmitted) {
+          // 重置除了该namespace下的其他state
+          newState = {
+            ...newState,
+            ...omit(initialState, [data])
+          }
+        } else {
+          // 重置单个namespace
+          newState = {
+            ...newState,
+            [data]: initialState[data]
+          }
         }
-      } else if (Array.isArray(payload)) {
+      } else if (Array.isArray(data)) {
         // 重置多个namespace 包括重置某些namespace下的所有字段，重置某些namespace下的部分字段
         newState = updateStateByObj(
           {
             ...newState,
             ...pick(
               initialState,
-              payload.filter((x) => typeof x === 'string')
+              data.filter((x) => typeof x === 'string')
             )
           },
-          merge(payload.filter((x) => isObject(x))),
+          merge(data.filter((x) => isObject(x))),
           initialState
         )
-      } else if (isObject(payload)) {
+      } else if (isObject(data)) {
         // 重置多个namespace下的多个字段
-        newState = updateStateByObj(newState, payload, initialState)
+        newState = updateStateByObj(newState, data, initialState)
       }
     }
 
