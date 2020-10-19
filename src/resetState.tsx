@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { isObject, pick } from './utils'
+import { isObject, pick, omit, merge } from './utils'
 
 export const resetType = '@@reset'
 
@@ -15,7 +15,13 @@ export interface AnyAction extends Action {
 
 type Reducer<S> = (state: S, action: AnyAction) => S
 
-type NamespaceOrFiled = string | string[] | { [key: string]: string | string[] }
+type NamespaceWithPartialField = { [key: string]: string | string[] }
+
+type NamespaceOrFiled =
+  | string
+  | string[]
+  | NamespaceWithPartialField
+  | (NamespaceWithPartialField | string)[]
 
 interface ICommonObject {
   [key: string]: any
@@ -92,29 +98,47 @@ export const resetInitialReducer: (reducer: Reducer<any>) => any = (
           [payload]: initialState[payload]
         }
       } else if (Array.isArray(payload)) {
-        // 重置多个namespace
-        newState = {
-          ...newState,
-          ...pick(initialState, payload)
-        }
+        // 重置多个namespace 包括重置某些namespace下的所有字段，重置某些namespace下的部分字段
+        newState = updateStateByObj(
+          {
+            ...newState,
+            ...pick(
+              initialState,
+              payload.filter((x) => typeof x === 'string')
+            )
+          },
+          merge(payload.filter((x) => isObject(x))),
+          initialState
+        )
       } else if (isObject(payload)) {
         // 重置多个namespace下的多个字段
-        newState = { ...newState }
-        Object.keys(payload).forEach((namespace) => {
-          newState[namespace] = {
-            ...newState[namespace],
-            ...updateObjByPath(
-              payload[namespace],
-              initialState[namespace],
-              newState[namespace]
-            )
-          }
-        })
+        newState = updateStateByObj(newState, payload, initialState)
       }
     }
 
     return newState
   }
+}
+
+// 重置多个namespace下的多个字段
+const updateStateByObj = (
+  newState: any,
+  payload: NamespaceWithPartialField,
+  initialState: any
+) => {
+  newState = { ...newState }
+  Object.keys(payload).forEach((namespace) => {
+    newState[namespace] = {
+      ...newState[namespace],
+      ...updateObjByPath(
+        payload[namespace],
+        initialState[namespace],
+        newState[namespace]
+      )
+    }
+  })
+
+  return newState
 }
 
 const updateObjByPath = (
@@ -157,11 +181,17 @@ const checkNamespaceOrField = (
 }
 
 const throwError = (
-  field: string,
+  field: string | NamespaceWithPartialField,
   obj: { [key: string]: any },
   text?: string
 ) => {
-  if (!(field in obj)) {
-    throw new Error(`${text || field}不存在`)
+  if (typeof field === 'string') {
+    if (!(field in obj)) {
+      throw new Error(`${text || field}不存在`)
+    }
+  } else {
+    Object.keys(field).forEach((x) => {
+      throwError(x, obj, text)
+    })
   }
 }

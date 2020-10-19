@@ -1,4 +1,9 @@
-import { resetInitialReducer, resetState, useResetState } from './resetState'
+import {
+  resetInitialReducer,
+  resetState,
+  useResetState,
+  reset
+} from './resetState'
 
 const createResetState = () => {
   return {
@@ -6,6 +11,6 @@ const createResetState = () => {
   }
 }
 
-export { resetState, useResetState }
+export { createResetState, resetState, useResetState, reset }
 
 export default createResetState

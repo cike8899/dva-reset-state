@@ -9,5 +9,8 @@ export const initialState = {
   editProduct: {
     productInfo: {},
     user: 'geek'
+  },
+  userList: {
+    list: []
   }
 }

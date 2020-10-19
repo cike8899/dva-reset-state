@@ -6,7 +6,7 @@
 
 ## Install
 
-```bash
+```
 npm install --save dva-reset-state
 ```
 
@@ -54,6 +54,28 @@ const EditProduct = ({ dispatch }: { dispatch: Dispatch<any> }) => {
 export default connect()(EditProduct);
 ```
 
+3. 在任何事件或者函数中使用
+
+```
+import React from "react";
+import { connect } from "dva";
+import { Dispatch } from "redux";
+import { reset } from "dva-reset-state";
+
+const Demo = ({ dispatch }: { dispatch: Dispatch<any> }) => {
+  const onClick = () => {
+    reset(dispatch, ["userList", { productList: ["list", "pageInfo"] }]);
+  };
+  return (
+    <div>
+      <button onClick={onClick}></button>
+    </div>
+  );
+};
+
+export default connect()(Demo);
+```
+
 ## 重置哪些数据？
 
 1. 重置所有 state,不传递参数
@@ -96,12 +118,20 @@ useResetState(dispatch,{productList:"list"});
 useResetState(dispatch,{productList:["list","total"]});
 ```
 
-5. 重置多个个 namespace 下的多个数据
+6. 重置多个 namespace 下的多个数据
 
 ```
 @resetState({productList:["list","total"],editProduct:"productInfo"})
 
 useResetState(dispatch,{productList:["list","total"],editProduct:"productInfo"});
+```
+
+7. 重置某些 namespace 下所有字段或者重置某些 namespace 下部分字段
+
+```
+@resetState(['userList', { productList: ['list', 'pageInfo'] }])
+
+useResetState(dispatch,['userList', { productList: ['list', 'pageInfo'] }]);
 ```
 
 ## License

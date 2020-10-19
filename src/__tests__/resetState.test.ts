@@ -43,6 +43,12 @@ const rootReducer = (
         }
       }
 
+    case 'userList/alterUserList':
+      return {
+        ...state,
+        userList: action.payload
+      }
+
     default:
       return state
   }
@@ -168,6 +174,7 @@ describe('restState', () => {
       }
     })
     expect(mockFn).toHaveNthReturnedWith(2, {
+      ...initialState,
       productList: {
         ...initialState.productList,
         list: [{ id: 1, title: 'geek' }]
@@ -185,6 +192,119 @@ describe('restState', () => {
     })
 
     expect(mockFn).toHaveNthReturnedWith(3, initialState)
+  })
+
+  it('reset all filed of one and partial data of the other one ', () => {
+    const mockFn = jest.fn(() => {
+      const ret: any = store.getState()
+      return ret
+    })
+    store.subscribe(mockFn)
+
+    // 修改数据
+    store.dispatch({
+      type: 'productList/setProductList',
+      payload: [{ id: 1, title: 'geek' }]
+    })
+
+    store.dispatch({
+      type: 'productList/setProdcutListPage',
+      payload: { pageSize: 7 }
+    })
+
+    store.dispatch({
+      type: 'editProduct/alterProductInfo',
+      payload: {
+        id: 1,
+        name: 'default',
+        description: 'system default project',
+        createTime: '2019-12-09T02:18:29Z',
+        modTime: '2020-06-08T06:59:51Z'
+      }
+    })
+
+    store.dispatch({
+      type: 'userList/alterUserList',
+      payload: [{ id: 1, name: 'balibabu' }]
+    })
+
+    //通过namespace，重置userList下的所有状态,重置productList跟editProduct下部分状态
+    reset(store.dispatch, ['userList', { productList: ['list', 'pageInfo'] }])
+
+    expect(mockFn).toBeCalledTimes(5)
+
+    expect(mockFn).toHaveNthReturnedWith(1, {
+      ...initialState,
+      productList: {
+        ...initialState.productList,
+        list: [{ id: 1, title: 'geek' }]
+      }
+    })
+
+    expect(mockFn).toHaveNthReturnedWith(2, {
+      ...initialState,
+      productList: {
+        ...initialState.productList,
+        list: [{ id: 1, title: 'geek' }],
+        pageInfo: {
+          pageSize: 7
+        }
+      }
+    })
+
+    expect(mockFn).toHaveNthReturnedWith(3, {
+      ...initialState,
+      productList: {
+        ...initialState.productList,
+        list: [{ id: 1, title: 'geek' }],
+        pageInfo: {
+          pageSize: 7
+        }
+      },
+      editProduct: {
+        ...initialState.editProduct,
+        productInfo: {
+          id: 1,
+          name: 'default',
+          description: 'system default project',
+          createTime: '2019-12-09T02:18:29Z',
+          modTime: '2020-06-08T06:59:51Z'
+        }
+      }
+    })
+    expect(mockFn).toHaveNthReturnedWith(4, {
+      productList: {
+        ...initialState.productList,
+        list: [{ id: 1, title: 'geek' }],
+        pageInfo: {
+          pageSize: 7
+        }
+      },
+      editProduct: {
+        ...initialState.editProduct,
+        productInfo: {
+          id: 1,
+          name: 'default',
+          description: 'system default project',
+          createTime: '2019-12-09T02:18:29Z',
+          modTime: '2020-06-08T06:59:51Z'
+        }
+      },
+      userList: [{ id: 1, name: 'balibabu' }]
+    })
+    expect(mockFn).toHaveNthReturnedWith(5, {
+      ...initialState,
+      editProduct: {
+        ...initialState.editProduct,
+        productInfo: {
+          id: 1,
+          name: 'default',
+          description: 'system default project',
+          createTime: '2019-12-09T02:18:29Z',
+          modTime: '2020-06-08T06:59:51Z'
+        }
+      }
+    })
   })
 
   it('reset all', () => {
@@ -223,6 +343,7 @@ describe('restState', () => {
       }
     })
     expect(mockFn).toHaveNthReturnedWith(2, {
+      ...initialState,
       productList: {
         ...initialState.productList,
         list: [{ id: 1, title: 'geek' }]
