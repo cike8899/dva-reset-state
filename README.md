@@ -134,6 +134,27 @@ useResetState(dispatch,{productList:["list","total"],editProduct:"productInfo"})
 useResetState(dispatch,['userList', { productList: ['list', 'pageInfo'] }]);
 ```
 
+8. 重置给定 namespace 以外的 state
+
+   第三个参数需要设置为 true
+
+```
+@resetState(['userList', { productList: ['list', 'pageInfo'] }], true)
+
+useResetState(dispatch,['userList', { productList: ['list', 'pageInfo'] }], true);
+
+reset(store.dispatch,'userList',true)
+reset(store.dispatch,['userList','editProduct'],true)
+
+reset(
+  store.dispatch,
+  ['userList', { editProduct: ['productInfo'] }]
+  true
+)
+
+
+```
+
 ## License
 
 MIT © [balibabu](https://github.com/cike8899)

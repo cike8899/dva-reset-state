@@ -194,89 +194,226 @@ describe('restState', () => {
     expect(mockFn).toHaveNthReturnedWith(3, initialState)
   })
 
-  it('reset another field of namespace state except one namespace', () => {
-    const mockFn = jest.fn(() => {
-      const ret: any = store.getState()
-      return ret
-    })
-    store.subscribe(mockFn)
+  describe('reset some fileds except another fileds', () => {
+    // 重置给定字段以外的其他字段
+    let mockFn: any
+    beforeEach(() => {
+      mockFn = jest.fn(() => {
+        const ret: any = store.getState()
+        return ret
+      })
+      store.subscribe(mockFn)
 
-    // 修改数据
-    store.dispatch({
-      type: 'productList/setProductList',
-      payload: [{ id: 1, title: 'geek' }]
-    })
+      // 修改数据
+      store.dispatch({
+        type: 'productList/setProductList',
+        payload: [{ id: 1, title: 'geek' }]
+      })
 
-    store.dispatch({
-      type: 'editProduct/alterProductInfo',
-      payload: {
-        id: 1,
-        name: 'default',
-        description: 'system default project',
-        createTime: '2019-12-09T02:18:29Z',
-        modTime: '2020-06-08T06:59:51Z'
-      }
-    })
-
-    store.dispatch({
-      type: 'userList/alterUserList',
-      payload: [{ id: 1, name: 'balibabu' }]
-    })
-
-    reset(store.dispatch, 'userList', true)
-
-    expect(mockFn).toBeCalledTimes(4)
-
-    expect(mockFn).toHaveNthReturnedWith(1, {
-      ...initialState,
-      productList: {
-        ...initialState.productList,
-        list: [{ id: 1, title: 'geek' }]
-      }
-    })
-
-    expect(mockFn).toHaveNthReturnedWith(2, {
-      ...initialState,
-      productList: {
-        ...initialState.productList,
-        list: [{ id: 1, title: 'geek' }]
-      },
-      editProduct: {
-        ...initialState.editProduct,
-        productInfo: {
+      store.dispatch({
+        type: 'editProduct/alterProductInfo',
+        payload: {
           id: 1,
           name: 'default',
           description: 'system default project',
           createTime: '2019-12-09T02:18:29Z',
           modTime: '2020-06-08T06:59:51Z'
         }
-      }
+      })
+
+      store.dispatch({
+        type: 'userList/alterUserList',
+        payload: [{ id: 1, name: 'balibabu' }]
+      })
     })
 
-    expect(mockFn).toHaveNthReturnedWith(3, {
-      ...initialState,
-      productList: {
-        ...initialState.productList,
-        list: [{ id: 1, title: 'geek' }]
-      },
-      editProduct: {
-        ...initialState.editProduct,
-        productInfo: {
-          id: 1,
-          name: 'default',
-          description: 'system default project',
-          createTime: '2019-12-09T02:18:29Z',
-          modTime: '2020-06-08T06:59:51Z'
+    afterEach(() => {
+      expect(mockFn).toHaveNthReturnedWith(1, {
+        ...initialState,
+        productList: {
+          ...initialState.productList,
+          list: [{ id: 1, title: 'geek' }]
         }
-      },
-      userList: [{ id: 1, name: 'balibabu' }]
+      })
+
+      expect(mockFn).toHaveNthReturnedWith(2, {
+        ...initialState,
+        productList: {
+          ...initialState.productList,
+          list: [{ id: 1, title: 'geek' }]
+        },
+        editProduct: {
+          ...initialState.editProduct,
+          productInfo: {
+            id: 1,
+            name: 'default',
+            description: 'system default project',
+            createTime: '2019-12-09T02:18:29Z',
+            modTime: '2020-06-08T06:59:51Z'
+          }
+        }
+      })
+
+      expect(mockFn).toHaveNthReturnedWith(3, {
+        ...initialState,
+        productList: {
+          ...initialState.productList,
+          list: [{ id: 1, title: 'geek' }]
+        },
+        editProduct: {
+          ...initialState.editProduct,
+          productInfo: {
+            id: 1,
+            name: 'default',
+            description: 'system default project',
+            createTime: '2019-12-09T02:18:29Z',
+            modTime: '2020-06-08T06:59:51Z'
+          }
+        },
+        userList: [{ id: 1, name: 'balibabu' }]
+      })
+    })
+    it('reset another field of namespace state except one namespace', () => {
+      reset(store.dispatch, 'userList', true)
+
+      expect(mockFn).toBeCalledTimes(4)
+      expect(mockFn).toHaveNthReturnedWith(4, {
+        ...initialState,
+        userList: [{ id: 1, name: 'balibabu' }]
+      })
+    })
+    it('reset the data under the namespace except for the fields in the given object', () => {
+      // 重置除了给定对象内字段的其他namespace下的数据
+      reset(
+        store.dispatch,
+        { productList: 'list', editProduct: ['productInfo'] },
+        true
+      )
+      expect(mockFn).toBeCalledTimes(4)
+      expect(mockFn).toHaveNthReturnedWith(4, {
+        ...initialState,
+        productList: {
+          ...initialState.productList,
+          list: [{ id: 1, title: 'geek' }]
+        },
+        editProduct: {
+          ...initialState.editProduct,
+          productInfo: {
+            id: 1,
+            name: 'default',
+            description: 'system default project',
+            createTime: '2019-12-09T02:18:29Z',
+            modTime: '2020-06-08T06:59:51Z'
+          }
+        }
+      })
     })
 
-    expect(mockFn).toHaveNthReturnedWith(4, {
-      ...initialState,
-      userList: [{ id: 1, name: 'balibabu' }]
+    it('reset other namespaces except the namespace field of the given object and the namespace array', () => {
+      // 重置除了给定对象namespace字段以及namespace数组的其他namespace
+      store.dispatch({
+        type: 'productList/setProdcutListPage',
+        payload: { pageSize: 7 }
+      })
+      reset(
+        store.dispatch,
+        ['userList', { productList: 'list', editProduct: ['productInfo'] }],
+        true
+      )
+
+      expect(mockFn).toBeCalledTimes(5)
+      expect(mockFn).toHaveNthReturnedWith(4, {
+        ...initialState,
+        productList: {
+          ...initialState.productList,
+          list: [{ id: 1, title: 'geek' }],
+          pageInfo: {
+            pageSize: 7
+          }
+        },
+        editProduct: {
+          ...initialState.editProduct,
+          productInfo: {
+            id: 1,
+            name: 'default',
+            description: 'system default project',
+            createTime: '2019-12-09T02:18:29Z',
+            modTime: '2020-06-08T06:59:51Z'
+          }
+        },
+        userList: [{ id: 1, name: 'balibabu' }]
+      })
+      expect(mockFn).toHaveNthReturnedWith(5, {
+        ...initialState,
+        productList: {
+          ...initialState.productList,
+          list: [{ id: 1, title: 'geek' }]
+        },
+        editProduct: {
+          ...initialState.editProduct,
+          productInfo: {
+            id: 1,
+            name: 'default',
+            description: 'system default project',
+            createTime: '2019-12-09T02:18:29Z',
+            modTime: '2020-06-08T06:59:51Z'
+          }
+        },
+        userList: [{ id: 1, name: 'balibabu' }]
+      })
+    })
+
+    it('reset other namespaces except the namespace field of the given object and the namespace array next', () => {
+      // 重置除了给定对象namespace字段以及namespace数组的其他namespace
+      store.dispatch({
+        type: 'productList/setProdcutListPage',
+        payload: { pageSize: 7 }
+      })
+      reset(
+        store.dispatch,
+        ['userList', { editProduct: ['productInfo'] }], // 比上面少了个namespace
+        true
+      )
+
+      expect(mockFn).toBeCalledTimes(5)
+      expect(mockFn).toHaveNthReturnedWith(4, {
+        ...initialState,
+        productList: {
+          ...initialState.productList,
+          list: [{ id: 1, title: 'geek' }],
+          pageInfo: {
+            pageSize: 7
+          }
+        },
+        editProduct: {
+          ...initialState.editProduct,
+          productInfo: {
+            id: 1,
+            name: 'default',
+            description: 'system default project',
+            createTime: '2019-12-09T02:18:29Z',
+            modTime: '2020-06-08T06:59:51Z'
+          }
+        },
+        userList: [{ id: 1, name: 'balibabu' }]
+      })
+      expect(mockFn).toHaveNthReturnedWith(5, {
+        ...initialState,
+        editProduct: {
+          ...initialState.editProduct,
+          productInfo: {
+            id: 1,
+            name: 'default',
+            description: 'system default project',
+            createTime: '2019-12-09T02:18:29Z',
+            modTime: '2020-06-08T06:59:51Z'
+          }
+        },
+        userList: [{ id: 1, name: 'balibabu' }]
+      })
     })
   })
+
   it('reset all filed of one and partial data of the other one ', () => {
     const mockFn = jest.fn(() => {
       const ret: any = store.getState()

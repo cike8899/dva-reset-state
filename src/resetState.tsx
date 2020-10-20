@@ -47,13 +47,14 @@ export const reset = (
 }
 
 // 还原namespace下所有state或某些字段
-export const resetState = (namespaces?: NamespaceOrFiled) => (
-  WrappedComponent: React.ComponentClass
-) => {
+export const resetState = (
+  namespaces?: NamespaceOrFiled,
+  isOmitted?: boolean
+) => (WrappedComponent: React.ComponentClass) => {
   return class ResetState extends React.PureComponent<any> {
     componentWillUnmount() {
       const { dispatch } = this.props
-      reset(dispatch, namespaces)
+      reset(dispatch, namespaces, isOmitted)
     }
 
     render() {
@@ -65,11 +66,12 @@ export const resetState = (namespaces?: NamespaceOrFiled) => (
 // 还原namespace下所有state或某些字段
 export const useResetState = (
   dispatch: PayloadDispatch,
-  namespaces?: NamespaceOrFiled
+  namespaces?: NamespaceOrFiled,
+  isOmitted?: boolean
 ) => {
   useEffect(() => {
     return () => {
-      reset(dispatch, namespaces)
+      reset(dispatch, namespaces, isOmitted)
     }
   }, [dispatch, namespaces])
 }
@@ -109,25 +111,76 @@ export const resetInitialReducer: (reducer: Reducer<any>) => any = (
           }
         }
       } else if (Array.isArray(data)) {
-        // 重置多个namespace 包括重置某些namespace下的所有字段，重置某些namespace下的部分字段
-        newState = updateStateByObj(
-          {
-            ...newState,
-            ...pick(
-              initialState,
-              data.filter((x) => typeof x === 'string')
-            )
-          },
-          merge(data.filter((x) => isObject(x))),
-          initialState
-        )
+        const mergedNamespaceObj = mergeNamespace(data) // 将带有字段的namespace对象聚合到一个对象
+        const stringNameSpace = data.filter((x) => typeof x === 'string') // 筛选出所有string namespace
+        if (isOmitted) {
+          const allNamespace = Object.keys(initialState)
+          // 重置除了数组中给定的namespace跟namespace对应字段外的其他namespace下的数据
+          const shouldUpdateNamespaceObj = getOtherNamespaceFieldsObjExceptGivenFields(
+            mergedNamespaceObj,
+            initialState
+          )
+          const shouldUpdateStringFields = allNamespace.filter(
+            (namespace) =>
+              Object.keys(shouldUpdateNamespaceObj).every(
+                (x) => x !== namespace
+              ) && stringNameSpace.every((x) => x !== namespace)
+          )
+
+          newState = updateStateByObj(
+            updateStateByStringArray(
+              newState,
+              shouldUpdateStringFields,
+              initialState
+            ),
+            shouldUpdateNamespaceObj,
+            initialState
+          )
+        } else {
+          // 重置多个namespace 包括重置某些namespace下的所有字段，重置某些namespace下的部分字段
+          newState = updateStateByObj(
+            updateStateByStringArray(
+              newState,
+              data.filter((x) => typeof x === 'string'),
+              initialState
+            ),
+            mergeNamespace(data),
+            initialState
+          )
+        }
       } else if (isObject(data)) {
-        // 重置多个namespace下的多个字段
-        newState = updateStateByObj(newState, data, initialState)
+        if (isOmitted) {
+          newState = updateAnotherStateExceptGivenFields(
+            newState,
+            data,
+            initialState
+          )
+          // 重置给定对象外的其他state
+        } else {
+          // 重置多个namespace下的多个字段
+          newState = updateStateByObj(newState, data, initialState)
+        }
       }
     }
 
     return newState
+  }
+}
+
+// 将namespace分散在不同对象下的namespace聚合到一个对象
+export const mergeNamespace = (data: any[]) => {
+  return merge(data.filter((x) => isObject(x)))
+}
+
+// 根据namespace为string的数组重置状态
+const updateStateByStringArray = (
+  newState: any,
+  payload: string[],
+  initialState: any
+) => {
+  return {
+    ...newState,
+    ...pick(initialState, payload)
   }
 }
 
@@ -150,6 +203,57 @@ const updateStateByObj = (
   })
 
   return newState
+}
+
+// 获取给定namespace下字段之外的字段
+const getOtherNamespaceFieldsObjExceptGivenFields = (
+  payload: NamespaceWithPartialField,
+  initialState: any
+) => {
+  // 排除给定namespace下给定的字段
+  const shouldUpdateNamespaceObj = Object.keys(payload).reduce(
+    (pre, namespace) => {
+      const shouldOmittFields = payload[namespace] // 传递过来的该namespace下的fields
+      const objWithAllFields = initialState[namespace] // 该namespace下的包含所有字段的对象
+      const objWithShouldUpdateFields = omit(
+        objWithAllFields,
+        shouldOmittFields
+      )
+      const shouldUpdateFields = Object.keys(objWithShouldUpdateFields)
+      if (shouldUpdateFields.length > 0) {
+        pre[namespace] = shouldUpdateFields
+      }
+      return pre
+    },
+    {}
+  )
+  return shouldUpdateNamespaceObj
+}
+
+// 重置给定对象外的其他state
+const updateAnotherStateExceptGivenFields = (
+  newState: any,
+  payload: NamespaceWithPartialField,
+  initialState: any
+) => {
+  const allNamespace = Object.keys(initialState)
+  // 排除给定namespace下给定的字段
+  const shouldUpdateNamespaceObj = getOtherNamespaceFieldsObjExceptGivenFields(
+    payload,
+    initialState
+  )
+
+  return updateStateByObj(
+    updateStateByStringArray(
+      newState,
+      allNamespace.filter((x) =>
+        Object.keys(shouldUpdateNamespaceObj).every((y) => y !== x)
+      ),
+      initialState
+    ),
+    shouldUpdateNamespaceObj,
+    initialState
+  )
 }
 
 const updateObjByPath = (

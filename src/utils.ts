@@ -27,11 +27,17 @@ export function pick(obj: { [key: string]: any }, keys: string | string[]) {
   return res
 }
 
-export function omit(obj: { [key: string]: any }, keys: string[]) {
+export function omit(obj: { [key: string]: any }, keys: string | string[]) {
   if (!isObject(obj) && typeof obj !== 'function') {
     return {}
   }
   const allKeys = Object.keys(obj)
+
+  if (typeof keys === 'string') {
+    const nextObj = { ...obj }
+    delete nextObj[keys]
+    return nextObj
+  }
   return allKeys.reduce((pre, cur) => {
     if (keys.every((x) => x !== cur)) {
       pre[cur] = obj[cur]
