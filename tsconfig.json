@@ -34,6 +34,9 @@
   "exclude": [
     "node_modules",
     "dist",
-    "example"
+    "example",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.constant.ts",
   ]
 }
