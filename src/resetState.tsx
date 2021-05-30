@@ -73,7 +73,7 @@ export const useResetState = (
     return () => {
       reset(dispatch, namespaces, isOmitted)
     }
-  }, [dispatch, namespaces])
+  }, [dispatch])
 }
 
 // 重置state到初始状态

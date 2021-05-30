@@ -10,6 +10,9 @@ const Header = () => {
       <li>
         <Link to='/editProduct'>edit product</Link>
       </li>
+      <li>
+        <Link to='/productCategory'>product category</Link>
+      </li>
     </ul>
   )
 }

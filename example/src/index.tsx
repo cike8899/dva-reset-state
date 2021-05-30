@@ -7,6 +7,7 @@ import App from './App'
 
 import editProduct from './models/editProduct'
 import productList from './models/productList'
+import productCategory from './models/productCategory'
 
 const history = createBrowserHistory({
   basename: ''
@@ -18,6 +19,7 @@ const app = dva({
 
 app.model(editProduct)
 app.model(productList)
+app.model(productCategory)
 
 app.use(createResetState())
 

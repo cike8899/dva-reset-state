@@ -6,6 +6,7 @@ import * as H from 'history'
 import Header from './Header'
 import ProductList from './ProductList'
 import EditProduct from './EditProduct'
+import ProductCategory from './ProductCategory'
 
 // import { ExampleComponent } from 'dva-reset-state'
 // import 'dva-reset-state/dist/index.css'
@@ -30,6 +31,7 @@ const App: React.FC<IProps> = ({ history }) => {
             )}
           />
           <Route path='/editProduct' component={EditProduct} />
+          <Route path='/productCategory' component={ProductCategory} />
         </Switch>
       </>
     </Router>
