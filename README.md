@@ -23,6 +23,26 @@ const app: any = dva()
 app.use(createResetState())
 ```
 
+- 在 umi@3 中使用
+
+app.ts
+
+```
+import { plugin } from 'umi';
+
+import createResetState from 'dva-reset-state';
+
+// 注册插件
+plugin.register({
+  apply: {
+    dva: {
+      plugins: [createResetState()],
+    },
+  },
+  path: 'any', // 随意填写个字符串，否则报错
+});
+```
+
 - 在需要重置状态的组件中使用
 
 1. class 组件
