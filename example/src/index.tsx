@@ -1,6 +1,6 @@
 import './index.css'
 
-import dva from 'dva_2.6.0-beta.20'
+import dva from 'dva'
 import { createBrowserHistory } from 'history'
 import createResetState from 'dva-reset-state'
 import App from './App'

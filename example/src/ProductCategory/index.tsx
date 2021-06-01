@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
-import { useDispatch } from 'dva_2.6.0-beta.20'
+import { useDispatch } from 'dva'
 
 import { useResetState } from 'dva-reset-state'
 
@@ -21,7 +21,7 @@ const ProductCategory = () => {
     fetchList()
   }, [fetchList])
 
-  useResetState(dispatch, { productCategory: 'list' })
+  useResetState({ productCategory: 'list' })
 
   return <div>ProductCategory</div>
 }

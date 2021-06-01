@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect, DispatchProp } from 'dva_2.6.0-beta.20'
+import { connect, DispatchProp } from 'dva'
 import { compose } from 'redux'
 import { resetState } from 'dva-reset-state'
 

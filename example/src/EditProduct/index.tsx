@@ -1,11 +1,11 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'dva_2.6.0-beta.20'
+import { useDispatch, useSelector } from 'dva'
 import { useResetState } from 'dva-reset-state'
 
 const EditProduct = () => {
   const dispatch = useDispatch()
   const productInfo = useSelector((state: any) => state.editProduct.productInfo)
-  useResetState(dispatch, 'editProduct')
+  useResetState('editProduct')
 
   const onTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({

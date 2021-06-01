@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useDispatch } from 'dva'
 
 import { isObject, pick, merge, omit } from './utils'
 
@@ -65,10 +66,10 @@ export const resetState = (
 
 // 还原namespace下所有state或某些字段
 export const useResetState = (
-  dispatch: PayloadDispatch,
   namespaces?: NamespaceOrFiled,
   isOmitted?: boolean
 ) => {
+  const dispatch = useDispatch()
   useEffect(() => {
     return () => {
       reset(dispatch, namespaces, isOmitted)

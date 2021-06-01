@@ -1,4 +1,4 @@
-import { Model } from 'dva_2.6.0-beta.20'
+import { Model } from 'dva'
 
 const model: Model = {
   namespace: 'productList',

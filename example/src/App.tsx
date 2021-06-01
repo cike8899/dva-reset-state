@@ -11,6 +11,8 @@ import ProductCategory from './ProductCategory'
 // import { ExampleComponent } from 'dva-reset-state'
 // import 'dva-reset-state/dist/index.css'
 
+// const { Route, Switch, Router } = router
+
 interface IProps {
   history: H.History
   app?: DvaInstance
