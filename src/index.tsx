@@ -1,6 +1,7 @@
 import {
   resetInitialReducer,
   resetState,
+  useResetStateWillUnmount,
   useResetState,
   reset
 } from './resetState'
@@ -11,6 +12,12 @@ const createResetState = () => {
   }
 }
 
-export { createResetState, resetState, useResetState, reset }
+export {
+  createResetState,
+  resetState,
+  useResetStateWillUnmount,
+  useResetState,
+  reset
+}
 
 export default createResetState

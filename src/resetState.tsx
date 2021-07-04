@@ -64,8 +64,8 @@ export const resetState = (
   }
 }
 
-// 还原namespace下所有state或某些字段
-export const useResetState = (
+// 组件销毁前，还原namespace下所有state或某些字段
+export const useResetStateWillUnmount = (
   namespaces?: NamespaceOrFiled,
   isOmitted?: boolean
 ) => {
@@ -75,6 +75,14 @@ export const useResetState = (
       reset(dispatch, namespaces, isOmitted)
     }
   }, [dispatch])
+}
+
+// 还原namespace下所有state或某些字段
+export const useResetState = () => {
+  const dispatch = useDispatch()
+  return (namespaces?: NamespaceOrFiled, isOmitted?: boolean) => {
+    reset(dispatch, namespaces, isOmitted)
+  }
 }
 
 // 重置state到初始状态

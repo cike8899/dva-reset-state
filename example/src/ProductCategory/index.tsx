@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch } from 'dva'
 
-import { useResetState } from 'dva-reset-state'
+import { useResetStateWillUnmount } from 'dva-reset-state'
 
 const initialList = [
   { id: 1, title: '台灯' },
@@ -21,7 +21,7 @@ const ProductCategory = () => {
     fetchList()
   }, [fetchList])
 
-  useResetState({ productCategory: 'list' })
+  useResetStateWillUnmount({ productCategory: 'list' })
 
   return <div>ProductCategory</div>
 }
