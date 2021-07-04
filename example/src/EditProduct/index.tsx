@@ -1,11 +1,13 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'dva'
-import { useResetStateWillUnmount } from 'dva-reset-state'
+import { useResetStateWillUnmount, useResetState } from 'dva-reset-state'
 
 const EditProduct = () => {
   const dispatch = useDispatch()
   const productInfo = useSelector((state: any) => state.editProduct.productInfo)
   useResetStateWillUnmount('editProduct')
+
+  const resetState = useResetState()
 
   const onTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({
@@ -25,6 +27,10 @@ const EditProduct = () => {
         price: e.target.value
       }
     })
+  }
+
+  const handleClick = () => {
+    resetState('editProduct')
   }
 
   return (
@@ -48,6 +54,11 @@ const EditProduct = () => {
           value={productInfo.price}
           onChange={onPriceChange}
         />
+      </div>
+      <div>
+        <button type='button' onClick={handleClick}>
+          重置
+        </button>
       </div>
     </form>
   )
