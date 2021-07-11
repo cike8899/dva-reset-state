@@ -48,7 +48,7 @@ export const reset = (
 }
 
 // 还原namespace下所有state或某些字段
-export const resetState = (
+export const resetStateWillOnmount = (
   namespaces?: NamespaceOrFiled,
   isOmitted?: boolean
 ) => (WrappedComponent: React.ComponentClass) => {

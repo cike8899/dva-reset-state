@@ -1,6 +1,6 @@
 import {
   resetInitialReducer,
-  resetState,
+  resetStateWillOnmount,
   useResetStateWillUnmount,
   useResetState,
   reset
@@ -14,7 +14,7 @@ const createResetState = () => {
 
 export {
   createResetState,
-  resetState,
+  resetStateWillOnmount,
   useResetStateWillUnmount,
   useResetState,
   reset

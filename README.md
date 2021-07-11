@@ -48,10 +48,10 @@ plugin.register({
 1. class 组件
 
 ```
-import { resetState } from "dva-reset-state";
+import { resetStateWillOnmount } from "dva-reset-state";
 
 @connect() // connect必须写在resetState上面
-@resetState("product")
+@resetStateWillOnmount("product")
 export default class SQLManage extends Component<any> {
   render(){
     return <div>uuu</div>
@@ -63,28 +63,29 @@ export default class SQLManage extends Component<any> {
 
 ```
 import React from "react";
-import { connect } from "dva";
-import { Dispatch } from "redux";
-import { useResetState } from "dva-reset-state";
-const EditProduct = ({ dispatch }: { dispatch: Dispatch<any> }) => {
-  useResetState(dispatch, { editProduct: "productInfo" });
+import { useResetStateWillUnmount } from "dva-reset-state";
+
+const EditProduct = () => {
+  useResetStateWillUnmount({ editProduct: "productInfo" });
   return <div>ooo</div>;
 };
 
-export default connect()(EditProduct);
+export default EditProduct;
 ```
 
-3. 在任何事件或者函数中使用
+3. 在任何事件或函数中使用
+
+* 函数组件
 
 ```
 import React from "react";
-import { connect } from "dva";
-import { Dispatch } from "redux";
-import { reset } from "dva-reset-state";
+import { useResetStateWillUnmount } from "dva-reset-state";
 
-const Demo = ({ dispatch }: { dispatch: Dispatch<any> }) => {
+const Demo = () => {
+  const resetState = useResetStateWillUnmount()
+
   const onClick = () => {
-    reset(dispatch, ["userList", { productList: ["list", "pageInfo"] }]);
+    resetState(["userList", { productList: ["list", "pageInfo"] }]);
   };
   return (
     <div>
@@ -93,7 +94,28 @@ const Demo = ({ dispatch }: { dispatch: Dispatch<any> }) => {
   );
 };
 
-export default connect()(Demo);
+export default Demo;
+```
+* class 组件
+```
+import React from "react";
+import { connect } from "dva";
+import { reset } from "dva-reset-state";
+
+@connect()
+export default class Demo extends React.Component<any>{
+     onClick = () => {
+        reset(this.props.dispatch,["userList", { productList: ["list", "pageInfo"] }]);
+      };
+    render(){
+        return (
+            <div>
+              <button onClick={this.onClick}></button>
+            </div>
+          );
+    }
+}
+
 ```
 
 ## 重置哪些数据？
@@ -101,57 +123,57 @@ export default connect()(Demo);
 1. 重置所有 state,不传递参数
 
 ```
-@resetState()
+@resetStateWillOnmount()
 
-useResetState(dispatch);
+useResetStateWillUnmount();
 ```
 
 2. 重置单个 namespace 数据
 
 ```
-@resetState("editProduct")
+@resetStateWillOnmount("editProduct")
 
-useResetState(dispatch,"editProduct");
+useResetStateWillUnmount("editProduct");
 ```
 
 3. 重置多个 namespace 下的所有数据
 
 ```
-@resetState(["productList","editProduct"])
+@resetStateWillOnmount(["productList","editProduct"])
 
-useResetState(dispatch,["productList","editProduct"]);
+useResetStateWillUnmount(["productList","editProduct"]);
 ```
 
 4. 重置单个 namespace 下的单个数据
 
 ```
-@resetState({productList:"list"})
+@resetStateWillOnmount({productList:"list"})
 
-useResetState(dispatch,{productList:"list"});
+useResetStateWillUnmount({productList:"list"});
 ```
 
 5. 重置单个 namespace 下的多个数据
 
 ```
-@resetState({productList:["list","total"]})
+@resetStateWillOnmount({productList:["list","total"]})
 
-useResetState(dispatch,{productList:["list","total"]});
+useResetStateWillUnmount({productList:["list","total"]});
 ```
 
 6. 重置多个 namespace 下的多个数据
 
 ```
-@resetState({productList:["list","total"],editProduct:"productInfo"})
+@resetStateWillOnmount({productList:["list","total"],editProduct:"productInfo"})
 
-useResetState(dispatch,{productList:["list","total"],editProduct:"productInfo"});
+useResetStateWillUnmount({productList:["list","total"],editProduct:"productInfo"});
 ```
 
 7. 重置某些 namespace 下所有字段或者重置某些 namespace 下部分字段
 
 ```
-@resetState(['userList', { productList: ['list', 'pageInfo'] }])
+@resetStateWillOnmount(['userList', { productList: ['list', 'pageInfo'] }])
 
-useResetState(dispatch,['userList', { productList: ['list', 'pageInfo'] }]);
+useResetStateWillUnmount(['userList', { productList: ['list', 'pageInfo'] }]);
 ```
 
 8. 重置给定 namespace 以外的 state
@@ -159,9 +181,9 @@ useResetState(dispatch,['userList', { productList: ['list', 'pageInfo'] }]);
    第三个参数需要设置为 true
 
 ```
-@resetState(['userList', { productList: ['list', 'pageInfo'] }], true)
+@resetStateWillOnmount(['userList', { productList: ['list', 'pageInfo'] }], true)
 
-useResetState(dispatch,['userList', { productList: ['list', 'pageInfo'] }], true);
+useResetStateWillUnmount(['userList', { productList: ['list', 'pageInfo'] }], true);
 
 reset(store.dispatch,'userList',true)
 reset(store.dispatch,['userList','editProduct'],true)
