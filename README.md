@@ -79,10 +79,10 @@ export default EditProduct;
 
 ```
 import React from "react";
-import { useResetStateWillUnmount } from "dva-reset-state";
+import { useResetState } from "dva-reset-state";
 
 const Demo = () => {
-  const resetState = useResetStateWillUnmount()
+  const resetState = useResetState()
 
   const onClick = () => {
     resetState(["userList", { productList: ["list", "pageInfo"] }]);
