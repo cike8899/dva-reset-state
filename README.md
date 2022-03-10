@@ -48,10 +48,10 @@ plugin.register({
 1. class 组件
 
 ```
-import { resetStateWillOnmount } from "dva-reset-state";
+import { resetStateWillUnmount } from "dva-reset-state";
 
 @connect() // connect必须写在resetState上面
-@resetStateWillOnmount("product")
+@resetStateWillUnmount("product")
 export default class SQLManage extends Component<any> {
   render(){
     return <div>uuu</div>
@@ -75,7 +75,7 @@ export default EditProduct;
 
 3. 在任何事件或函数中使用
 
-* 函数组件
+- 函数组件
 
 ```
 import React from "react";
@@ -96,7 +96,9 @@ const Demo = () => {
 
 export default Demo;
 ```
-* class 组件
+
+- class 组件
+
 ```
 import React from "react";
 import { connect } from "dva";
@@ -123,7 +125,7 @@ export default class Demo extends React.Component<any>{
 1. 重置所有 state,不传递参数
 
 ```
-@resetStateWillOnmount()
+@resetStateWillUnmount()
 
 useResetStateWillUnmount();
 ```
@@ -131,7 +133,7 @@ useResetStateWillUnmount();
 2. 重置单个 namespace 数据
 
 ```
-@resetStateWillOnmount("editProduct")
+@resetStateWillUnmount("editProduct")
 
 useResetStateWillUnmount("editProduct");
 ```
@@ -139,7 +141,7 @@ useResetStateWillUnmount("editProduct");
 3. 重置多个 namespace 下的所有数据
 
 ```
-@resetStateWillOnmount(["productList","editProduct"])
+@resetStateWillUnmount(["productList","editProduct"])
 
 useResetStateWillUnmount(["productList","editProduct"]);
 ```
@@ -147,7 +149,7 @@ useResetStateWillUnmount(["productList","editProduct"]);
 4. 重置单个 namespace 下的单个数据
 
 ```
-@resetStateWillOnmount({productList:"list"})
+@resetStateWillUnmount({productList:"list"})
 
 useResetStateWillUnmount({productList:"list"});
 ```
@@ -155,7 +157,7 @@ useResetStateWillUnmount({productList:"list"});
 5. 重置单个 namespace 下的多个数据
 
 ```
-@resetStateWillOnmount({productList:["list","total"]})
+@resetStateWillUnmount({productList:["list","total"]})
 
 useResetStateWillUnmount({productList:["list","total"]});
 ```
@@ -163,7 +165,7 @@ useResetStateWillUnmount({productList:["list","total"]});
 6. 重置多个 namespace 下的多个数据
 
 ```
-@resetStateWillOnmount({productList:["list","total"],editProduct:"productInfo"})
+@resetStateWillUnmount({productList:["list","total"],editProduct:"productInfo"})
 
 useResetStateWillUnmount({productList:["list","total"],editProduct:"productInfo"});
 ```
@@ -171,7 +173,7 @@ useResetStateWillUnmount({productList:["list","total"],editProduct:"productInfo"
 7. 重置某些 namespace 下所有字段或者重置某些 namespace 下部分字段
 
 ```
-@resetStateWillOnmount(['userList', { productList: ['list', 'pageInfo'] }])
+@resetStateWillUnmount(['userList', { productList: ['list', 'pageInfo'] }])
 
 useResetStateWillUnmount(['userList', { productList: ['list', 'pageInfo'] }]);
 ```
@@ -181,7 +183,7 @@ useResetStateWillUnmount(['userList', { productList: ['list', 'pageInfo'] }]);
    第三个参数需要设置为 true
 
 ```
-@resetStateWillOnmount(['userList', { productList: ['list', 'pageInfo'] }], true)
+@resetStateWillUnmount(['userList', { productList: ['list', 'pageInfo'] }], true)
 
 useResetStateWillUnmount(['userList', { productList: ['list', 'pageInfo'] }], true);
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect, DispatchProp } from 'dva'
 import { compose } from 'redux'
-import { resetStateWillOnmount } from 'dva-reset-state'
+import { resetStateWillUnmount } from 'dva-reset-state'
 
 interface IProps {
   list: any[]
@@ -10,7 +10,7 @@ interface IProps {
 // 使用装饰器也可以，resetState需要放在connect下面
 
 // @connect((props: any) => ({ list: props.productList.list })),
-// @resetStateWillOnmount('productList')
+// @resetStateWillUnmount('productList')
 class ProductList extends React.Component<IProps & DispatchProp> {
   getData = () => {
     this.props.dispatch({
@@ -42,5 +42,5 @@ class ProductList extends React.Component<IProps & DispatchProp> {
 
 export default compose<React.ComponentClass>(
   connect((props: any) => ({ list: props.productList.list })),
-  resetStateWillOnmount('productList')
+  resetStateWillUnmount('productList')
 )(ProductList)
