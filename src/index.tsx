@@ -6,9 +6,9 @@ import {
   reset
 } from './resetState'
 
-const createResetState = () => {
+const createResetState = (shouldReturnNewObj: boolean = false) => {
   return {
-    onReducer: resetInitialReducer
+    onReducer: resetInitialReducer(shouldReturnNewObj)
   }
 }
 

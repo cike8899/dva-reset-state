@@ -56,7 +56,7 @@ const rootReducer = (
 
 let store: Store<any>
 beforeEach(() => {
-  store = createStoreLast(resetInitialReducer(rootReducer))
+  store = createStoreLast(resetInitialReducer(true)(rootReducer))
 })
 
 describe('restState', () => {

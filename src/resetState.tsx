@@ -86,8 +86,8 @@ export const useResetState = () => {
 }
 
 // 重置state到初始状态
-export const resetInitialReducer: (reducer: Reducer<any>) => any = (
-  reducer
+export const resetInitialReducer = (shouldReturnNewObj: boolean = false) => (
+  reducer: Reducer<any>
 ) => {
   let initialState: any = null
   return (state: any, action: any) => {
@@ -104,19 +104,25 @@ export const resetInitialReducer: (reducer: Reducer<any>) => any = (
       checkNamespaceOrField(data, initialState)
       if (data === undefined) {
         // 重置所有state
-        newState = initialState
+        newState = shallowCopyStateByFlag(initialState, shouldReturnNewObj)
       } else if (typeof data === 'string') {
         if (isOmitted) {
           // 重置除了该namespace下的其他state
           newState = {
             ...newState,
-            ...omit(initialState, [data])
+            ...shallowCopyStateByFlag(
+              omit(initialState, [data]),
+              shouldReturnNewObj
+            )
           }
         } else {
           // 重置单个namespace
           newState = {
             ...newState,
-            [data]: initialState[data]
+            ...shallowCopyStateByFlag(
+              { [data]: initialState[data] },
+              shouldReturnNewObj
+            )
           }
         }
       } else if (Array.isArray(data)) {
@@ -140,10 +146,12 @@ export const resetInitialReducer: (reducer: Reducer<any>) => any = (
             updateStateByStringArray(
               newState,
               shouldUpdateStringFields,
-              initialState
+              initialState,
+              shouldReturnNewObj
             ),
             shouldUpdateNamespaceObj,
-            initialState
+            initialState,
+            shouldReturnNewObj
           )
         } else {
           // 重置多个namespace 包括重置某些namespace下的所有字段，重置某些namespace下的部分字段
@@ -151,10 +159,12 @@ export const resetInitialReducer: (reducer: Reducer<any>) => any = (
             updateStateByStringArray(
               newState,
               data.filter((x) => typeof x === 'string'),
-              initialState
+              initialState,
+              shouldReturnNewObj
             ),
             mergeNamespace(data),
-            initialState
+            initialState,
+            shouldReturnNewObj
           )
         }
       } else if (isObject(data)) {
@@ -162,12 +172,18 @@ export const resetInitialReducer: (reducer: Reducer<any>) => any = (
           newState = updateAnotherStateExceptGivenFields(
             newState,
             data,
-            initialState
+            initialState,
+            shouldReturnNewObj
           )
           // 重置给定对象外的其他state
         } else {
           // 重置多个namespace下的多个字段
-          newState = updateStateByObj(newState, data, initialState)
+          newState = updateStateByObj(
+            newState,
+            data,
+            initialState,
+            shouldReturnNewObj
+          )
         }
       }
     }
@@ -185,11 +201,12 @@ export const mergeNamespace = (data: any[]) => {
 const updateStateByStringArray = (
   newState: any,
   payload: string[],
-  initialState: any
+  initialState: any,
+  shouldReturnNewObj: boolean
 ) => {
   return {
     ...newState,
-    ...pick(initialState, payload)
+    ...shallowCopyStateByFlag(pick(initialState, payload), shouldReturnNewObj)
   }
 }
 
@@ -197,16 +214,18 @@ const updateStateByStringArray = (
 const updateStateByObj = (
   newState: any,
   payload: NamespaceWithPartialField,
-  initialState: any
+  initialState: any,
+  shouldReturnNewObj: boolean = false
 ) => {
   newState = { ...newState }
   Object.keys(payload).forEach((namespace) => {
     newState[namespace] = {
       ...newState[namespace],
-      ...updateObjByPath(
+      ...updateObjByFields(
         payload[namespace],
         initialState[namespace],
-        newState[namespace]
+        newState[namespace],
+        shouldReturnNewObj
       )
     }
   })
@@ -243,7 +262,8 @@ const getOtherNamespaceFieldsObjExceptGivenFields = (
 const updateAnotherStateExceptGivenFields = (
   newState: any,
   payload: NamespaceWithPartialField,
-  initialState: any
+  initialState: any,
+  shouldReturnNewObj: boolean
 ) => {
   const allNamespace = Object.keys(initialState)
   // 排除给定namespace下给定的字段
@@ -258,22 +278,73 @@ const updateAnotherStateExceptGivenFields = (
       allNamespace.filter((x) =>
         Object.keys(shouldUpdateNamespaceObj).every((y) => y !== x)
       ),
-      initialState
+      initialState,
+      shouldReturnNewObj
     ),
     shouldUpdateNamespaceObj,
-    initialState
+    initialState,
+    shouldReturnNewObj
   )
 }
 
-const updateObjByPath = (
-  path: string[] | string,
-  values: ICommonObject,
-  obj: ICommonObject
+const updateObjByFields = (
+  shouldBeUpdatedFields: string[] | string,
+  initialNamespaceState: ICommonObject,
+  newNamespaceState: ICommonObject,
+  shouldReturnNewObj: boolean
 ) => {
-  return Object.keys(obj).reduce((pre, cur) => {
-    pre[cur] = path.includes(cur) ? values[cur] : obj[cur]
+  return Object.keys(newNamespaceState).reduce((pre, cur) => {
+    pre[cur] = shouldBeUpdatedFields.includes(cur)
+      ? getInitialFieldValueByFlag(
+          initialNamespaceState,
+          cur,
+          shouldReturnNewObj
+        )
+      : newNamespaceState[cur]
     return pre
   }, {})
+}
+
+// 对给定部分namespace下的所有字段进行浅复制
+const shallowCopyStateByFlag = (
+  state: Record<string, any>,
+  shouldReturnNewObj: boolean
+) => {
+  if (shouldReturnNewObj) {
+    return Object.keys(state).reduce((pre, namespace) => {
+      const initialNamespaceState = state[namespace]
+      pre[namespace] = shallowCopyAllFieldsOfOneNamespace(initialNamespaceState)
+
+      return pre
+    }, {})
+  }
+
+  return state
+}
+// 浅复制某个namespace下的所有字段
+const shallowCopyAllFieldsOfOneNamespace = (state: Record<string, any>) => {
+  return Object.keys(state).reduce((pre, field) => {
+    pre[field] = getInitialFieldValueByFlag(state, field, true)
+    return pre
+  }, {})
+}
+
+// 根据参数判断确定是否需要返回新的对象
+const getInitialFieldValueByFlag = (
+  initialNamespaceState: Record<string, any>,
+  field: string,
+  shouldReturnNewObj: boolean
+) => {
+  const initialValue = initialNamespaceState[field]
+  if (shouldReturnNewObj) {
+    if (isObject(initialValue)) {
+      return { ...initialValue }
+    } else if (Array.isArray(initialValue)) {
+      return [...initialValue]
+    }
+  }
+
+  return initialValue
 }
 
 const checkNamespaceOrField = (

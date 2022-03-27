@@ -36,7 +36,7 @@ import createResetState from 'dva-reset-state';
 plugin.register({
   apply: {
     dva: {
-      plugins: [createResetState()],
+      plugins: [createResetState(true)],// 对于引用类型的字段，重置后每次都返回新的引用,从而触发useEffect的更新
     },
   },
   path: 'any', // 随意填写个字符串，否则报错
